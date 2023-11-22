@@ -65,8 +65,11 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 const fetchUsersCtrl = expressAsyncHandler(async (req, res) => {
   try {
-    const users = await User.find({});
-    res.json(users);
+    const users = await User.find({}).sort({_id:-1});
+    res.status(200).json({
+      success:true,
+      data:users
+    })
   } catch (error) {
     res.json(error);
   }
@@ -77,13 +80,21 @@ const fetchUsersCtrl = expressAsyncHandler(async (req, res) => {
 //------------------------------
 const deleteUsersCtrl = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
+  const isAdmin = req.user.isAdmin
   //check if user id is valid
   validateMongodbId(id);
   try {
+    if(!isAdmin) {
+      throw new Error("You don't have permission to delete user")
+    }
     const deletedUser = await User.findByIdAndDelete(id);
-    res.json(deletedUser);
+    res.status(200).json({
+      success: true,
+      message: deletedUser? "Deleted Successfully": "No user Found or have already deleted",
+      data:deletedUser?deletedUser: null
+    })
   } catch (error) {
-    res.json(error);
+    throw new Error(error)
   }
 });
 

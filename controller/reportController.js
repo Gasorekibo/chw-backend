@@ -3,13 +3,14 @@ import Report from "../model/Report.js";
 import fs from "fs";
 import cloudinaryUploadPhoto from "../utils/cloudinary.js"
 import { fail } from "assert";
+import validateMongodbId from "../utils/validateMongodbId.js"
 
 // ======= Create Report =====
 
 const createReport = expressAsyncHandler(async(req, res)=> {
-    console.log("hitted")
     try {
         const {_id} = req.user
+        validateMongodbId(_id)
         //1. Get the local path to img
   const localPath = `public/images/reports/${req.file.filename}`;
   //2.Upload to cloudinary
@@ -18,7 +19,7 @@ const createReport = expressAsyncHandler(async(req, res)=> {
             title: req.body.title,
             reporter:_id,
             description: req.body.description,
-            chw: req.body.userId,
+            chw: req.body.chw,
             image:imgUploaded?.url
         });
         fs.unlinkSync(localPath);
@@ -44,22 +45,32 @@ const createReport = expressAsyncHandler(async(req, res)=> {
 
 // ===== Get All reports reported to this CHW ===
 const getAllReport = expressAsyncHandler(async(req, res)=> {
+    validateMongodbId(req.params._id)
     try {
-        const reports = await Report.find({chw:req.body.id}).populate("chw").populate("reporter");
+        const reports = await Report.find({chw:req?.params?._id}).populate("chw").populate("reporter").sort({"_id": -1});
         if(!reports) return res.status(404).json({
             success: false,
             message: "No Reports found for this CHW"
         })
-        return res.status(200).json({
-                status:true,
-                data:reports
-        })
+        if(reports.length > 0) {
+            
+            return res.status(200).json({
+                    status:true,
+                    data:reports
+            })
+        } else {
+            return res.status(404).json({
+                success:false,
+                message:"No Reports Found For This CHW"
+            })
+        }
     } catch (error) {
         throw new Error(error.message || "Something went wrong") 
     }
 })
 // ===== Get All reports Reported by Specific reporter ==
 const getSingleReporter = expressAsyncHandler(async(req, res)=> {
+    validateMongodbId(req.query.i)
     try {
         const reports = await Report.find({reporter:req.query.i}).sort({_id:-1});
         return res.status(200).json({
@@ -72,34 +83,36 @@ const getSingleReporter = expressAsyncHandler(async(req, res)=> {
 })
 // ===== Get single reports Reported by Specific reporter ==
 const getSingleReport = expressAsyncHandler(async(req, res)=> {
+    validateMongodbId(req.query.i)
     try {
-        const reports = await Report.findById(req.query.i);
-        return res.status(200).json({
-                status:true,
-                data:reports ? {...reports,}: "No Report Found"
-        })
+        const reports = await Report.findById(req.query.i).populate("reporter");
+        // return res.status(200).json({
+        //         status:true,
+        //         data:reports ? reports: "No Report Found"
+        // })
 
-    //     const imageUrl = reports.image;
+    const imageUrl = reports.image;
 
-    // return res.status(200).json({
-    //   success: true,
-    //   data: {
-    //     reporter: reports.reporter,
-    //     title: reports.title,
-    //     description: reports.description,
-    //     image: imageUrl,
-    //     chw: reports.chw,
-    //     _id: reports._id,
-    //     __v: reports.__v,
-    //     downloadLink: `${imageUrl}?dl=true`,
-    //   },
-    // });
+    return res.status(200).json({
+      success: true,
+      data: {
+        reporter: reports.reporter,
+        title: reports.title,
+        description: reports.description,
+        image: imageUrl,
+        chw: reports.chw,
+        _id: reports._id,
+        __v: reports.__v,
+        downloadLink: `${imageUrl}?dl=true`,
+      },
+    });
     } catch (error) {
         throw new Error(error.message || "Something went wrong")
     }
 })
 
 const deleteReport = expressAsyncHandler(async(req, res)=> {
+    validateMongodbId(req.params.id)
     try {
         const report = await Report.findByIdAndDelete(req.params.id);
         return res.json({
