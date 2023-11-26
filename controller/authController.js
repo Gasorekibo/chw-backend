@@ -102,13 +102,20 @@ const deleteUsersCtrl = expressAsyncHandler(async (req, res) => {
 //user details
 //----------------
 const fetchUserDetailsCtrl = expressAsyncHandler(async (req, res) => {
+  const {_id} = req?.user
   const { userId } = req.params;
   //check if user id is valid
 
   validateMongodbId(userId);
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("viewedBy");
+    
+    if (!user.viewedBy.includes(_id)) {
+      user.viewedBy.push(_id);
+      await user.save();
+    }
     res.json(user);
+    
   } catch (error) {
     res.json(error);
   }
@@ -125,7 +132,7 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
 
   //Get the login user
   try {
-    const userProfile = await User.findById(id).populate("posts");
+    const userProfile = await User.findById(id).populate("posts").populate("viewedBy");
     res.json(userProfile);
   } catch (error) {
     res.json(error);

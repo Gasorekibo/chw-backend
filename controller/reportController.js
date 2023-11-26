@@ -1,5 +1,6 @@
 import expressAsyncHandler from "express-async-handler";
 import Report from "../model/Report.js";
+import User from "../model/User.js"
 import fs from "fs";
 import cloudinaryUploadPhoto from "../utils/cloudinary.js"
 import { fail } from "assert";
@@ -124,10 +125,57 @@ const deleteReport = expressAsyncHandler(async(req, res)=> {
   
     }
 })
+
+// ====== Forward report to admin =====
+const forwardReport = expressAsyncHandler(async(req, res)=> {
+    validateMongodbId(req.query.id)
+    try {
+        const report = await Report.findById(req.query.id)
+        if(!report) {
+            throw new Error("Report not found")
+        }
+        const admin = await User.findOne({isAdmin:true});
+        if(!admin) {
+            throw new Error("No admin Found")
+        }
+        const reportForward = await Report.findByIdAndUpdate( req.query.id,{
+            title: report?.title,
+            reporter:report?.chw,
+            description: report?.description,
+            chw: admin?._id,
+            image:report?.image,
+            
+        }, {new:true})
+        report.isForwarded = true;
+        await report.save()
+        res.status(200).json({
+            success:true,
+            message:"Report Forwarded Successfully",
+            data:reportForward
+        })
+    } catch (error) {
+        throw new Error(error.message)
+    }
+});
+// ======= Find All forwarded reports ====
+
+const getForwarded = expressAsyncHandler(async(req, res)=> {
+    try {
+        const forwared = await Report.find({isForwarded:true}).populate("reporter").sort({_id:-1});
+        res.status(200).json({
+            success:true,
+            data:forwared.length > 0 ? forwared : "No Report Found"
+        })
+    } catch (error) {
+       throw new Error(error.message) 
+    }
+})
 export {
     createReport,
     getAllReport,
     getSingleReporter,
     getSingleReport,
-    deleteReport
+    deleteReport,
+    forwardReport,
+    getForwarded
 }

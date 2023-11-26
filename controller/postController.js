@@ -20,7 +20,10 @@ const createPostController = expressAsyncHandler(async (req, res) => {
     throw new Error(
       "Create Post Failed and you have been blocked because you have used profane words in your post."
     );
-  }
+  } 
+  await User.findByIdAndUpdate(_id, {
+    $inc: { postCount: 1 },
+  });
   const localPath = `public/images/posts/${req.file.filename}`;
   // //2.Upload to cloudinary
   const imgUploaded = await cloudinaryUploadPhoto(localPath);
