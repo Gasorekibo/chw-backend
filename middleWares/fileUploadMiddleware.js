@@ -121,6 +121,9 @@ const createDirectoryIfNotExists = (directory) => {
   }
 };
 
+// Get the current module's directory using import.meta.url
+const currentModuleDirectory = path.dirname(new URL(import.meta.url).pathname);
+
 // Configure image storage: we are going to temporarily store our image in multer memory storage
 const multerStorage = multer.memoryStorage();
 
@@ -158,12 +161,12 @@ const resizeImageMiddleware = expressAsyncHandler(async (req, res, next) => {
     next();
   } else {
     // Construct the output directory path
-    const outputDirectory = path.join(__dirname, 'public/images/profiles/');
+    const outputDirectory = path.join(currentModuleDirectory, 'public/images/profiles/');
 
     // Create the directory if it doesn't exist
     createDirectoryIfNotExists(outputDirectory);
 
-    // Give a file a custom name to prevent the upload of similar profile photo;
+    // Give a file a custom name to prevent the upload of a similar profile photo;
     req.file.filename = `user-${Date.now()}-${req.file.originalname}`;
 
     // Resize and save the image
@@ -187,12 +190,12 @@ const postImgResizeMiddleware = expressAsyncHandler(async (req, res, next) => {
     next();
   } else {
     // Construct the output directory path
-    const outputDirectory = path.join(__dirname, 'public/images/posts/');
+    const outputDirectory = path.join(currentModuleDirectory, 'public/images/posts/');
 
     // Create the directory if it doesn't exist
     createDirectoryIfNotExists(outputDirectory);
 
-    // Give a file a custom name to prevent the upload of similar profile photo;
+    // Give a file a custom name to prevent the upload of a similar profile photo;
     req.file.filename = `user-${Date.now()}-${req.file.originalname}`;
 
     // Resize and save the image
@@ -216,12 +219,12 @@ const reportResizeMiddleware = expressAsyncHandler(async (req, res, next) => {
     next();
   } else {
     // Construct the output directory path
-    const outputDirectory = path.join(__dirname, 'public/images/reports/');
+    const outputDirectory = path.join(currentModuleDirectory, 'public/images/reports/');
 
     // Create the directory if it doesn't exist
     createDirectoryIfNotExists(outputDirectory);
 
-    // Give a file a custom name to prevent the upload of similar profile photo;
+    // Give a file a custom name to prevent the upload of a similar profile photo;
     req.file.filename = `user-${Date.now()}-${req.file.originalname}`;
 
     // Resize and save the image
