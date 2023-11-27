@@ -21,7 +21,7 @@ const createReport = expressAsyncHandler(async(req, res)=> {
             chw: req.body.chw,
             image:imgUploaded?.url
         });
-        fs.unlinkSync(localPath);
+        //fs.unlinkSync(localPath);
         if(!report) {
             res.json({
                 status: fail,
