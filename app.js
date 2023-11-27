@@ -22,7 +22,10 @@ app.use(cors());
 dbConnect();
 
 // Server Routings
-app.get("/", (req, res)=> {res.json({status:200, message:"Welcome to chwss platform"})})
+app.get("/", (req, res)=> {res.json({
+  status:200,
+  message:"Welcome to chwss platform"
+})})
 app.use("/api/users", userRoute);
 app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute);
