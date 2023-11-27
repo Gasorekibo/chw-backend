@@ -7,85 +7,39 @@ import validateMongodbId from "../utils/validateMongodbId.js"
 
 // ======= Create Report =====
 
-// const createReport = expressAsyncHandler(async(req, res)=> {
-//     try {
-//         const {_id} = req.user
-//         //1. Get the local path to img
-//   const localPath = `public/images/reports/${req.file.filename}`;
-//   //2.Upload to cloudinary
-//   const imgUploaded = await cloudinaryUploadPhoto(localPath);
-//         const report = await Report.create({
-//             title: req.body.title,
-//             reporter:_id,
-//             description: req.body.description,
-//             chw: req.body.chw,
-//             image:imgUploaded?.url
-//         });
-//         fs.unlinkSync(localPath);
-//         if(!report) {
-//             res.json({
-//                 status: fail,
-//                 message:"Failed to add new report",
-
-//             })
-//         } else {
-//             return res.status(200).json({
-//                 success: true,
-//                 data: report
-//             })
-    
-//         }
-        
-//     } catch (error) {
-//         throw new Error(error.message || "Something went wrong")
-//     }
-// })
-
-const createReport = expressAsyncHandler(async (req, res) => {
+const createReport = expressAsyncHandler(async(req, res)=> {
     try {
-      const { _id } = req.user;
-  
-      // New logic to create the directory if it doesn't exist
-      const uploadDirectory = 'public/images/reports/';
-      const localPath = `${uploadDirectory}${req.file.filename}`;
-  
-      // Function to create a directory if it doesn't exist
-      const createDirectoryIfNotExists = (directory) => {
-        if (!fs.existsSync(directory)) {
-          fs.mkdirSync(directory, { recursive: true });
+        const {_id} = req.user
+        //1. Get the local path to img
+  const localPath = `public/images/reports/${req.file.filename}`;
+  //2.Upload to cloudinary
+  const imgUploaded = await cloudinaryUploadPhoto(localPath);
+        const report = await Report.create({
+            title: req.body.title,
+            reporter:_id,
+            description: req.body.description,
+            chw: req.body.chw,
+            image:imgUploaded?.url
+        });
+        fs.unlinkSync(localPath);
+        if(!report) {
+            res.json({
+                status: fail,
+                message:"Failed to add new report",
+
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                data: report
+            })
+    
         }
-      };
-  
-      // Create the directory if it doesn't exist
-      createDirectoryIfNotExists(path.join(__dirname, uploadDirectory));
-  
-      // Continue with your existing code
-      const imgUploaded = await cloudinaryUploadPhoto(localPath);
-      const report = await Report.create({
-        title: req.body.title,
-        reporter: _id,
-        description: req.body.description,
-        chw: req.body.chw,
-        image: imgUploaded?.url,
-      });
-      fs.unlinkSync(localPath);
-  
-      if (!report) {
-        res.json({
-          status: 'fail',
-          message: 'Failed to add new report',
-        });
-      } else {
-        return res.status(200).json({
-          success: true,
-          data: report,
-        });
-      }
+        
     } catch (error) {
-      throw new Error(error.message || 'Something went wrong');
+        throw new Error(error.message || "Something went wrong")
     }
-  });
-  
+})
 
 
 // ===== Get All reports reported to this CHW ===
