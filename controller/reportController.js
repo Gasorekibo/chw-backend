@@ -11,7 +11,6 @@ import validateMongodbId from "../utils/validateMongodbId.js"
 const createReport = expressAsyncHandler(async(req, res)=> {
     try {
         const {_id} = req.user
-        validateMongodbId(_id)
         //1. Get the local path to img
   const localPath = `public/images/reports/${req.file.filename}`;
   //2.Upload to cloudinary
