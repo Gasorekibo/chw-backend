@@ -42,7 +42,7 @@ const fetchSinglePostController = expressAsyncHandler(async (req, res) => {
   validateMongodbId(id);
 
   try {
-    const comment = await Comment.findById(id);
+    const comment = await Comment.find({ post: id }).populate("author");
     if (!comment) {
       res.json({ message: "Comment not found" });
     } else {
