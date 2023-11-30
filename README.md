@@ -51,9 +51,9 @@ node app.js
 
 Technologies used in the project:
 
-```
-*   NodeJs express
-*   Mongodb/ Mongoose
-*   React with Redux toolkit
 
-```
+*   [NodeJs](https://nodejs.org/en/) / [Express](https://expressjs.com/en/guide/routing.html)
+*  [MongoDB](https://www.mongodb.com/) / [Mongoose](https://mongoosejs.com/docs/guide.html)
+*   [React](https://react.dev/learn) / [Redux toolkit](https://redux-toolkit.js.org/introduction/getting-started)
+
+
