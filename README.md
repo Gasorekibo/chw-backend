@@ -14,18 +14,25 @@ Here're some of the project's best features:
 *   Health worker can forward report to the Admin
 
 <h2>🛠️ Installation Steps:</h2>
+<p>Create a new folder</p>
 
-<p>1. Clone Backend repository:</p>
+``` cd new folder ```
+
+<p>1. i) Clone Backend repository:</p>
 
 ```
-https://github.com/Gasorekibo/chw-backend.git
+git clone https://github.com/Gasorekibo/chw-backend.git
 ```
+<p>1 ii) Clone Frontend repository:</p>
+
+``` 
+git clone https://github.com/Gasorekibo/chw-frontend.git
+ ``` 
 
 <p>2. Install Dependencies</p>
 
-```
-npm install
-```
+``` cd backend``` and run ```npm install``` and then 
+``` cd frontend``` and run ```npm install```
 
 <p>3. Set up Environment Variables</p>
 
@@ -43,10 +50,8 @@ EMAIL=
 
   <p>4. Run the application </p>
 
-  ```
-node app.js
-
-```
+  Inside backend run ```node app.js```, inside frontend run ```npm start ```
+  The app will start on [localhost](http://localost:your_port)
 <h2>💻 Built with</h2>
 
 Technologies used in the project:
