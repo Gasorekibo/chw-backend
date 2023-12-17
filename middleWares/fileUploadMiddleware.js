@@ -5,6 +5,7 @@ import multer from "multer";
 import sharp from "sharp";
 import path from "path";
 import fs from 'fs'
+const fs = fs.promises
 
 // configure image storage: we are going to temporary store our image in multer memory storage
 
@@ -81,60 +82,26 @@ const resizeImageMiddleware = expressAsyncHandler(async (req, res, next) => {
 
 //----------------- post image resizing -------------
 
-// const postImgResizeMiddleware = expressAsyncHandler(async (req, res, next) => {
-//   // if no file uploaded from the above middleware, else we will have access to the image using req.file
-//   if (!req.file) {
-//     next();
-//   } else {
-//     // give a file a custom name to prevent upload of similar profile photo;
-
-//     req.file.filename = `user-${Date.now()}-${req.file.originalname}`;
-//     await sharp(req.file.buffer)
-//       .resize(500, 500)
-//       .toFormat("jpeg")
-//       .jpeg({
-//         quality: 90,
-//       })
-//       .toFile(path.join(`public/images/posts/${req.file.filename}`));
-
-//     next();
-//   }
-// });
-import { promises as fsPromises } from 'fs';
-import path from 'path';
-import sharp from 'sharp';
-import expressAsyncHandler from 'express-async-handler';
-
 const postImgResizeMiddleware = expressAsyncHandler(async (req, res, next) => {
-  try {
-    // if no file uploaded from the above middleware, else we will have access to the image using req.file
-    if (!req.file) {
-      next();
-    } else {
-      // give a file a custom name to prevent upload of similar profile photo;
-      req.file.filename = `user-${Date.now()}-${req.file.originalname}`;
+  // if no file uploaded from the above middleware, else we will have access to the image using req.file
+  if (!req.file) {
+    next();
+  } else {
+    // give a file a custom name to prevent upload of similar profile photo;
 
-      const targetDirectory = 'public/images/posts/';
-      const targetPath = path.join(targetDirectory, req.file.filename);
+    req.file.filename = `user-${Date.now()}-${req.file.originalname}`;
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat("jpeg")
+      .jpeg({
+        quality: 90,
+      })
+      .toFile(path.join(`public/images/posts/${req.file.filename}`));
 
-      // Ensure the target directory exists
-      await fsPromises.mkdir(targetDirectory, { recursive: true });
-
-      await sharp(req.file.buffer)
-        .resize(500, 500)
-        .toFormat('jpeg')
-        .jpeg({
-          quality: 90,
-        })
-        .toFile(targetPath);
-
-      next();
-    }
-  } catch (error) {
-    // Handle errors appropriately
-    res.status(500).json({ success: false, error: error.message || 'Something went wrong' });
+    next();
   }
 });
+
 
 // ========= Report image =====
 

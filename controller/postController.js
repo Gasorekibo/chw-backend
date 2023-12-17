@@ -9,6 +9,7 @@ import cloudinaryUploadPhoto from "../utils/cloudinary.js";
 // -------------- CREATE A POST ------------
 
 const createPostController = expressAsyncHandler(async (req, res) => {
+  res.json("hitedd")
   const { _id } = req.user;
   validateMongodbId(_id);
   const filter = new Filter();
@@ -36,8 +37,8 @@ const createPostController = expressAsyncHandler(async (req, res) => {
     });
 
     // Remove saved uploaded image from local file
-    // fs.unlinkSync(localPath);
     res.status(200).json(post);
+    fs.unlinkSync(localPath);
   } catch (error) {
     res.json(error);
   }
