@@ -4,6 +4,7 @@ import expressAsyncHandler from "express-async-handler";
 import multer from "multer";
 import sharp from "sharp";
 import path from "path";
+import fs from 'fs'
 
 // configure image storage: we are going to temporary store our image in multer memory storage
 
@@ -31,6 +32,27 @@ const multerFilter = (req, file, cb) => {
 const profilePhotoUploadMiddleware = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
+  limits: {
+    fileSize: 4000000, //Max 4MB
+  },
+});
+const multertestFilter = (req, file, cb) => {
+  if (!file) {
+    // No file uploaded
+    cb(null, true);
+  } else if (file.mimetype === "text/csv") {
+    // CSV file uploaded successfully
+    cb(null, true);
+  } else {
+    // Unsupported file format
+    cb({ msg: "Unsupported file format. Please upload a CSV file." }, false);
+  }
+};
+
+// test upload
+const testPhotoUploadMiddleware = multer({
+  storage: multerStorage,
+  fileFilter: multertestFilter,
   limits: {
     fileSize: 4000000, //Max 4MB
   },
@@ -100,10 +122,59 @@ const reportResizeMiddleware = expressAsyncHandler(async (req, res, next) => {
     next();
   }
 });
+// ========= csv image =====
+
+const csvResizeMiddleware = expressAsyncHandler(async (req, res, next) => {
+  // Check if a file has been uploaded
+  if (!req.file) {
+    next();
+  } else if (req.file.mimetype === 'text/csv') {
+    // Generate a filename for the CSV file
+    req.file.filename = `test-${Date.now()}-${req.file.originalname}`;
+    
+    // Specify the directory path
+    const directoryPath = 'public/images/csv';
+    const filePath = path.join(directoryPath, req.file.filename);
+
+    // Create the directory if it doesn't exist
+    fs.mkdir(directoryPath, { recursive: true }, (err) => {
+      if (err) {
+        // Handle the error (e.g., log it, return an error response, etc.)
+        console.error('Error creating directory:', err);
+        next(err);
+      } else {
+        // Save the CSV file to the specified directory
+        fs.writeFile(filePath, req.file.buffer, (err) => {
+          if (err) {
+            // Handle the error (e.g., log it, return an error response, etc.)
+            console.error('Error saving CSV file:', err);
+            next(err);
+          } else {
+            // Continue to the next middleware
+            next();
+          }
+        });
+      }
+    });
+  } else {
+    // For non-CSV files, resize the image and save it
+    req.file.filename = `test-${Date.now()}-${req.file.originalname}`;
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFile(path.join('public/images/csv', req.file.filename));
+
+    next();
+  }
+});
+
+
+
 
 export {
   profilePhotoUploadMiddleware,
   resizeImageMiddleware,
   postImgResizeMiddleware,
-  reportResizeMiddleware
+  reportResizeMiddleware,
+  csvResizeMiddleware,
+  testPhotoUploadMiddleware
 };

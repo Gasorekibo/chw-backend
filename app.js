@@ -9,6 +9,7 @@ import reportRoute from "./routes/report.js"
 import commentRoute from "./routes/commentRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import { errorHandler, notFound } from "./middleWares/errorHandler.js";
+import enumerateRoute from "./routes/enumerate.js";
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/report", reportRoute)
+app.use("/api/enumerate",enumerateRoute)
 
 // error handler should go under all routes
 app.use(notFound);
