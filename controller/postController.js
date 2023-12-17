@@ -36,7 +36,7 @@ const createPostController = expressAsyncHandler(async (req, res) => {
     });
 
     // Remove saved uploaded image from local file
-    fs.unlinkSync(localPath);
+    // fs.unlinkSync(localPath);
     res.status(200).json(post);
   } catch (error) {
     res.json(error);
