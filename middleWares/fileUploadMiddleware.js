@@ -5,7 +5,6 @@ import multer from "multer";
 import sharp from "sharp";
 import path from "path";
 import fs from 'fs'
-const fs = fs.promises
 
 // configure image storage: we are going to temporary store our image in multer memory storage
 

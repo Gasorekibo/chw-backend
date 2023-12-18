@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 
 const enumerateSchema = new mongoose.Schema({
-    firstname: { type: String, required: true },
-    lastname: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    github: { type: String},
-    discord: { type: String},
+    fullname: { type: String, required: true },
+    house_hold_number: { type: String, required: true, unique: true },
+    size: { type: String},
+    house_hold_id: { type: String, required:true, unique:true},
+    address:{type:String, required:true, unique:true},
+    camp:{type:String, required:true, enum:["mugombwa","ngarama", "kigeme", "kiziba", "mahama", "kibuye"]},
     completed:{type:Boolean, default:false}
 });
 
